@@ -18,16 +18,19 @@ SELECT avg(summarized_price) AS average_order_price, order_date FROM result_ex1 
 --ex2
 WITH result_ex2 AS (
 	SELECT 
-		od.order_id 
-		,STRING_AGG(od.pizza_id, ', ') AS pizzas_id
+		od.order_id
+		,od.pizza_id
 	FROM [dbo].[order_details] AS od
 	JOIN [dbo].[orders] AS o 
 		ON od.order_id = o.order_id
+	JOIN [dbo].[pizzas] AS p
+		ON od.pizza_id = p.pizza_id
+	JOIN [dbo].[pizza_types] AS pt
+		ON pt.pizza_type_id = p.pizza_type_id
 	WHERE 
-		o.date LIKE '2015-03%' AND od.pizza_id NOT LIKE '%hawaiian%'
-	GROUP BY od.order_id)
+		o.date LIKE '2015-03%' AND pt.ingredients NOT LIKE '%Pineapple%')
 
-SELECT * FROM result_ex2;
+SELECT order_id, STRING_AGG(pizza_id, ',') AS pizzas FROM result_ex2 GROUP BY order_id ORDER BY order_id;
 
 
 --ex3
